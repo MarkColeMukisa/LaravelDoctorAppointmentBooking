@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public function __construct()
+    {
+        if (config('database.default') === 'pgsql') {
+            $this->withinTransaction = false;
+        }
+    }
+
     /**
      * Run the migrations.
      */
