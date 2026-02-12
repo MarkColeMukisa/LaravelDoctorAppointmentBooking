@@ -88,11 +88,6 @@
             @endif
             {{ $slot }}
         </main>
-        @php($hideFooter = request()->routeIs('dashboard', 'doctor-dashboard', 'admin-dashboard', 'login', 'register', 'password.request', 'password.reset'))
-
-        @unless ($hideFooter)
-        <x-footer />
-        @endunless
     </div>
 
 </body>
