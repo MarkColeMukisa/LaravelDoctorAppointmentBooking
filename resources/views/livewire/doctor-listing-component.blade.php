@@ -36,6 +36,44 @@
           </div>
           <!-- End Header -->
 
+          <div class="space-y-3 p-4 md:hidden">
+            @forelse ($doctors as $item)
+              <article wire:key="doctor-mobile-{{ $item->id }}" class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">{{ $item->doctorUser->name }}</p>
+                    <p class="text-xs text-slate-500">{{ $item->doctorUser->email }}</p>
+                    <p class="mt-1 text-xs text-slate-600">{{ $item->speciality->speciality_name }} - {{ $item->hospital_name }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    wire:click="featured({{ $item->id }})"
+                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out {{ $item->is_featured ? 'bg-blue-600' : 'bg-gray-300' }}"
+                    role="switch"
+                    aria-checked="{{ $item->is_featured ? 'true' : 'false' }}"
+                  >
+                    <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out {{ $item->is_featured ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                  </button>
+                </div>
+
+                <p class="mt-3 text-xs text-slate-700">{{ \Illuminate\Support\Str::limit($item->bio, 130) }}</p>
+
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+                  <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                    {{ $item->experience }} Years
+                  </span>
+                  <div class="flex items-center gap-3">
+                    <a href="/edit/doctor/{{ $item->id }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">Edit</a>
+                    <button wire:confirm="Are you sure you want to delete this doctor?" wire:click="delete({{ $item->id }})" class="text-sm font-medium text-red-600 hover:text-red-800">Delete</button>
+                  </div>
+                </div>
+              </article>
+            @empty
+              <p class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-5 text-center text-sm text-slate-500">No data found!</p>
+            @endforelse
+          </div>
+
+          <div class="hidden md:block">
           <!-- Table -->
           <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
             <thead class="bg-gray-50 divide-y divide-gray-200 dark:bg-neutral-800 dark:divide-neutral-700">
@@ -162,6 +200,7 @@
             </tbody>
           </table>
           <!-- End Table -->
+          </div>
         </div>
       </div>
     </div>
