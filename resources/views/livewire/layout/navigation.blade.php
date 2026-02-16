@@ -44,6 +44,12 @@ new class extends Component
                         <x-nav-link :href="route('admin-specialities')" :active="request()->routeIs('admin-specialities')" wire:navigate>
                         {{ __('Specialities') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin-patients')" :active="request()->routeIs('admin-patients')" wire:navigate>
+                        {{ __('Patients') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin-announcements')" :active="request()->routeIs('admin-announcements')" wire:navigate>
+                        {{ __('Announcements') }}
+                        </x-nav-link>
                          <x-nav-link :href="route('admin-appointments')" :active="request()->routeIs('admin-appointments')" wire:navigate>
                         {{ __('All Appointments') }}
                         </x-nav-link>
@@ -68,6 +74,9 @@ new class extends Component
                         </x-nav-link>
                         <x-nav-link :href="route('doctor-appointments')" :active="request()->routeIs('doctor-appointments')" wire:navigate>
                         {{ __('My Appointments') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('doctor-patient-status-requests')" :active="request()->routeIs('doctor-patient-status-requests')" wire:navigate>
+                        {{ __('Status Requests') }}
                         </x-nav-link>
                     @endif
                 </div>

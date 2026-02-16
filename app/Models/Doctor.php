@@ -59,6 +59,11 @@ class Doctor extends Model
         return $this->hasMany(DoctorSchedule::class, 'doctor_id');
     }
 
+    public function patientStatusChangeRequests(): HasMany
+    {
+        return $this->hasMany(PatientStatusChangeRequest::class, 'doctor_id');
+    }
+
     public function getImageUrlAttribute(): string
     {
         if ($this->image) {

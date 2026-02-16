@@ -8,7 +8,6 @@ return new class extends Migration
 {
     public function __construct()
     {
-        parent::__construct();
 
         if (config('database.default') === 'pgsql') {
             $this->withinTransaction = false;

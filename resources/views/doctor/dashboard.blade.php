@@ -4,7 +4,7 @@
             {{ __('Doctor Dashboard') }}
         </h2>
     </x-slot>
-    <livewire:statistic-component/>
-    <livewire:doctor-availability-panel/>
-    <livewire:recent-appointments/>
+    <livewire:statistic-component defer />
+    <livewire:doctor-availability-panel defer />
+    <livewire:recent-appointments defer />
 </x-app-layout>
