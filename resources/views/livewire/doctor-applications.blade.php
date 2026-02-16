@@ -1,11 +1,6 @@
 <!-- Table Section -->
 <div class="max-w-[85rem] px-4 py-5 sm:px-6 lg:px-8 lg:py-7 mx-auto">
-  @if (session()->has('message') && request()->header('X-Livewire'))
-    <div wire:transition.opacity class="mb-3 bg-emerald-600 text-sm text-white rounded-lg p-3" role="alert">
-      <span class="font-semibold">Success</span>
-      <span class="ml-1">{{ session('message') }}.</span>
-    </div>
-  @endif
+  <x-success-toast :livewire-only="true" />
   <div wire:loading>
     <div class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-blue-500" role="status" aria-label="loading">
       <span class="sr-only">Loading...</span>

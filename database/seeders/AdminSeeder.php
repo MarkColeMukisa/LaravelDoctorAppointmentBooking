@@ -12,12 +12,12 @@ class AdminSeeder extends Seeder
     {
         $admins = [
             [
-                'name' => 'Amina Patel',
-                'email' => 'amina.patel@mediplus.test',
+                'name' => 'Casey Pires',
+                'email' => 'Caseypires88@gmail.com',
             ],
             [
-                'name' => 'Kelvin Smith',
-                'email' => 'kelvin.smith@mediplus.test',
+                'name' => 'Joe Gapp',
+                'email' => 'joegapp256@gmail.com',
             ],
         ];
 

@@ -45,6 +45,10 @@ class StatisticComponent extends Component
 
     public function mount()
     {
+        $now = Carbon::now();
+        $today = Carbon::today();
+        $lastWeek = $today->copy()->subWeek();
+        $lastMonth = $today->copy()->subMonth();
 
         $this->users_count = User::count();
         $this->doctors_count = Doctor::count();
@@ -52,82 +56,29 @@ class StatisticComponent extends Component
         $this->appointments_count = Appointment::count();
         $this->specialities_count = Specialities::count();
 
+        $this->last_week_users_count = User::whereBetween('created_at', [$lastWeek, $now])->count();
+        $this->last_month_users_count = User::whereBetween('created_at', [$lastMonth, $now])->count();
+        $this->last_week_doctor_count = Doctor::whereBetween('created_at', [$lastWeek, $now])->count();
+        $this->last_month_doctor_count = Doctor::whereBetween('created_at', [$lastMonth, $now])->count();
+        $this->last_week_patient_count = User::where('role', User::ROLE_PATIENT)->whereBetween('created_at', [$lastWeek, $now])->count();
+        $this->last_month_patient_count = User::where('role', User::ROLE_PATIENT)->whereBetween('created_at', [$lastMonth, $now])->count();
+
         if (auth()->user()->role == User::ROLE_DOCTOR) {
             $user_doctor = auth()->user();
             $doctor = Doctor::where('user_id', $user_doctor->id)->first();
-            $this->doctor_appointments_count = Appointment::where('doctor_id', $doctor->id)->count();
+            if ($doctor) {
+                $doctorAppointments = Appointment::where('doctor_id', $doctor->id);
 
-            // upcoming
-            $doctors_appointments = Appointment::where('doctor_id', $doctor->id)->get();
-            // dd($doctors_appointments);
-            foreach ($doctors_appointments as $value) {
-                if (Carbon::parse($value->appointment_date)->isAfter(Carbon::today())) {
-                    $this->upcoming_appointments_count++;
-                }
-
-                if (Carbon::parse($value->appointment_date)->isBefore(Carbon::today())) {
-                    $this->complete_appointments_count++;
-                }
-
-                if (Carbon::parse($value->appointment_date)->isBetween(Carbon::today()->subWeek(), Carbon::today())) {
-                    $this->last_week_appointments_count++;
-                }
-
-                if (Carbon::parse($value->appointment_date)->isBetween(Carbon::today()->subMonth(), Carbon::today())) {
-                    $this->last_month_appointments_count++;
-                }
+                $this->doctor_appointments_count = (clone $doctorAppointments)->count();
+                $this->upcoming_appointments_count = (clone $doctorAppointments)->whereDate('appointment_date', '>', $today)->count();
+                $this->complete_appointments_count = (clone $doctorAppointments)->whereDate('appointment_date', '<', $today)->count();
+                $this->last_week_appointments_count = (clone $doctorAppointments)->whereBetween('appointment_date', [$lastWeek->toDateString(), $today->toDateString()])->count();
+                $this->last_month_appointments_count = (clone $doctorAppointments)->whereBetween('appointment_date', [$lastMonth->toDateString(), $today->toDateString()])->count();
             }
-
+        } else {
+            $this->last_week_appointments_count = Appointment::whereBetween('created_at', [$lastWeek, $now])->count();
+            $this->last_month_appointments_count = Appointment::whereBetween('created_at', [$lastMonth, $now])->count();
         }
-
-        //  all users
-        $all_users = User::all();
-        foreach ($all_users as $value) {
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subWeek(), Carbon::today())) {
-                $this->last_week_users_count++;
-            }
-
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subMonth(), Carbon::today())) {
-                $this->last_month_users_count++;
-            }
-        }
-
-        //  all appointments
-        $all_appointment = Appointment::all();
-        foreach ($all_appointment as $value) {
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subWeek(), Carbon::today())) {
-                $this->last_week_appointments_count++;
-            }
-
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subMonth(), Carbon::today())) {
-                $this->last_month_appointments_count++;
-            }
-        }
-
-        //  all doctors
-        $all_doctors = Doctor::all();
-        foreach ($all_doctors as $value) {
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subWeek(), Carbon::today())) {
-                $this->last_week_doctor_count++;
-            }
-
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subMonth(), Carbon::today())) {
-                $this->last_month_doctor_count++;
-            }
-        }
-
-        //  all patients
-        $all_patients = User::where('role', User::ROLE_PATIENT)->get();
-        foreach ($all_patients as $value) {
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subWeek(), Carbon::today())) {
-                $this->last_week_patient_count++;
-            }
-
-            if (Carbon::parse($value->created_at)->isBetween(Carbon::today()->subMonth(), Carbon::today())) {
-                $this->last_month_patient_count++;
-            }
-        }
-
     }
 
     public function render()

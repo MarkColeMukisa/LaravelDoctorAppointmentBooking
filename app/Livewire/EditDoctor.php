@@ -1,102 +1,116 @@
+<?php
+
 namespace App\Livewire;
 
 use App\Models\Doctor;
 use App\Models\Specialities;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class EditDoctor extends Component
 {
-use WithFileUploads;
+    use WithFileUploads;
 
-public $doctor;
+    public Doctor $doctor;
 
-public $doctor_details;
+    public string $name = '';
 
-public $name;
+    public string $email = '';
 
-public $email;
+    public string $bio = '';
 
-public $bio;
+    public string $speciality_id = '';
 
-public $speciality_id;
+    public string $hospital_name = '';
 
-public $hospital_name;
+    public string $twitter = '';
 
-public $twitter = '';
+    public string $instagram = '';
 
-public $instagram = '';
+    public string $experience = '';
 
-public $experience = '';
+    public $specialities;
 
-public $specialities;
+    public $image;
 
-public $image;
+    public ?string $current_image = null;
 
-public $current_image;
+    public function mount(int $doctor_id): void
+    {
+        $this->doctor = Doctor::query()
+            ->with(['doctorUser', 'speciality'])
+            ->findOrFail($doctor_id);
 
-public function mount($doctor_id)
-{
-$this->doctor = Doctor::find($doctor_id);
+        $this->specialities = Specialities::query()
+            ->select(['id', 'speciality_name'])
+            ->orderBy('speciality_name')
+            ->get();
 
-$this->specialities = Specialities::all();
+        $this->name = $this->doctor->doctorUser?->name ?? '';
+        $this->email = $this->doctor->doctorUser?->email ?? '';
+        $this->bio = (string) $this->doctor->bio;
+        $this->speciality_id = (string) $this->doctor->speciality_id;
+        $this->hospital_name = (string) $this->doctor->hospital_name;
+        $this->twitter = (string) ($this->doctor->twitter ?? '');
+        $this->instagram = (string) ($this->doctor->instagram ?? '');
+        $this->experience = (string) ($this->doctor->experience ?? '');
+        $this->current_image = $this->doctor->image;
+    }
 
-$this->name = $this->doctor->doctorUser->name;
-$this->email = $this->doctor->doctorUser->email;
-$this->bio = $this->doctor->bio;
-$this->speciality_id = $this->doctor->speciality->id;
-$this->hospital_name = $this->doctor->hospital_name;
-$this->experience = $this->doctor->experience;
-$this->current_image = $this->doctor->image;
-}
+    public function update(): mixed
+    {
+        $validated = $this->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(User::class, 'email')->ignore($this->doctor->user_id),
+            ],
+            'bio' => ['required', 'string'],
+            'hospital_name' => ['required', 'string', 'max:255'],
+            'speciality_id' => ['required', 'integer', 'exists:specialities,id'],
+            'twitter' => ['nullable', 'string', 'max:255'],
+            'instagram' => ['nullable', 'string', 'max:255'],
+            'experience' => ['required', 'integer', 'min:0', 'max:80'],
+            'image' => ['nullable', 'image', 'max:2048'],
+        ]);
 
-public function update()
-{
-$this->validate([
-'name' => 'required',
-'email' => 'required',
-'bio' => 'required',
-'hospital_name' => 'required',
-'speciality_id' => 'required',
-'twitter' => 'string',
-'instagram' => 'string',
-'experience' => 'required',
-'image' => 'nullable|image|max:2048',
-]);
+        $this->doctor->update([
+            'bio' => $validated['bio'],
+            'hospital_name' => $validated['hospital_name'],
+            'speciality_id' => (int) $validated['speciality_id'],
+            'twitter' => $validated['twitter'],
+            'instagram' => $validated['instagram'],
+            'experience' => (int) $validated['experience'],
+            'image' => $this->image ? $this->image->store('public/doctors') : $this->current_image,
+        ]);
 
-$update = Doctor::where('id', $this->doctor->id)->update([
-'bio' => $this->bio,
-'hospital_name' => $this->hospital_name,
-'speciality_id' => $this->speciality_id,
-'twitter' => $this->twitter,
-'instagram' => $this->instagram,
-'experience' => $this->experience,
-'image' => $this->image ? $this->image->store('public/doctors') : $this->current_image,
-]);
+        $cleanName = trim($validated['name']);
+        if (stripos($cleanName, 'Dr. ') === 0) {
+            $cleanName = substr($cleanName, 4);
+        } elseif (stripos($cleanName, 'Dr ') === 0) {
+            $cleanName = substr($cleanName, 3);
+        }
 
-$user_update = User::where('id', $this->doctor->user_id)->first();
+        User::query()
+            ->whereKey($this->doctor->user_id)
+            ->update([
+                'name' => $cleanName,
+                'email' => $validated['email'],
+            ]);
 
-$cleanName = trim($this->name);
-if (stripos($cleanName, 'Dr. ') === 0) {
-$cleanName = substr($cleanName, 4);
-} elseif (stripos($cleanName, 'Dr ') === 0) {
-$cleanName = substr($cleanName, 3);
-}
+        session()->flash('message', 'Doctor updated successfully.');
 
-$user_update->update([
-'name' => $cleanName,
-'email' => $this->email,
-]);
+        return $this->redirect('/admin/doctors', navigate: true);
+    }
 
-session()->flash('message', 'Doctor Updated Successfully');
-
-return $this->redirect('/admin/doctors', navigate: true);
-
-}
-
-public function render()
-{
-return view('livewire.edit-doctor');
-}
+    public function render(): mixed
+    {
+        return view('livewire.edit-doctor');
+    }
 }

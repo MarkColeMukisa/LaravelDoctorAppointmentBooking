@@ -155,7 +155,7 @@ new class extends Component
         ]);
         $this->showDoctorModal = false;
 
-        session()->flash('message', 'Your doctor application has been submitted. You will receive an update after admin review.');
+        session()->now('message', 'Your doctor application has been submitted. You will receive an update after admin review.');
     }
 }; ?>
 
@@ -189,12 +189,7 @@ new class extends Component
                         </h3>
                         <div class="mt-4">
                             <!-- Registration Form -->
-                            @if (session()->has('message'))
-                            <div wire:transition.opacity class="mb-4 bg-emerald-600 text-sm text-white rounded-lg p-3" role="alert">
-                                <span class="font-semibold">Success</span>
-                                <span class="ml-1">{{ session('message') }}.</span>
-                            </div>
-                            @endif
+                            <x-success-toast />
                             <form wire:submit="register">
                                 <!-- Name -->
                                 <div>

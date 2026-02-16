@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PatientStatusChangeRequest;
+
 class AdminController extends Controller
 {
     public function loadAdminDashboard()
@@ -56,6 +58,35 @@ class AdminController extends Controller
     public function loadAllAppointments()
     {
         return view('admin.appointments');
+    }
+
+    public function loadPatientRecords()
+    {
+        return view('admin.patients');
+    }
+
+    public function loadAnnouncementBanners()
+    {
+        return view('admin.announcements');
+    }
+
+    public function printPatientStatusAudits()
+    {
+        $decisions = PatientStatusChangeRequest::query()
+            ->with([
+                'patient:id,name,email',
+                'admin:id,name',
+                'doctor.doctorUser:id,name',
+            ])
+            ->whereIn('status', [
+                PatientStatusChangeRequest::STATUS_APPROVED,
+                PatientStatusChangeRequest::STATUS_REJECTED,
+            ])
+            ->latest('decided_at')
+            ->limit(2000)
+            ->get();
+
+        return view('admin.patient-status-audits-print', compact('decisions'));
     }
 
     public function loadReschedulingForm($id)

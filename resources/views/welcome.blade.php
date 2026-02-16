@@ -16,6 +16,7 @@
 </head>
 
 <body class="antialiased font-sans">
+    <x-announcement-banner />
     <!-- ========== HEADER ========== -->
     <livewire:top-bar-navigation />
     <!-- ========== END HEADER ========== -->

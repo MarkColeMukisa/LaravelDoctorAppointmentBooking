@@ -1,4 +1,4 @@
 <x-app-layout>
-    <livewire:statistic-component/>
-    <livewire:recent-appointments/>
+    <livewire:statistic-component defer />
+    <livewire:recent-appointments defer />
 </x-app-layout>

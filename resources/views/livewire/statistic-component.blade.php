@@ -4,7 +4,7 @@
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     @if (auth()->user() && auth()->user()->role == 2)
          <!-- Card -->
-         <a href="">
+         <a href="{{ route('admin-dashboard') }}">
           <div class="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm hover:shadow-md rounded-xl dark:bg-neutral-900 dark:border-neutral-800">
             <div class="inline-flex justify-center items-center">
               <span class="size-2 inline-block bg-orange-500 rounded-full me-2"></span>
@@ -32,7 +32,7 @@
         <!-- End Card -->
 
     <!-- Card -->
-    <a href="/admin/doctors">
+    <a href="{{ route('admin-doctors') }}">
     <div class="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm hover:shadow-md rounded-xl dark:bg-neutral-900 dark:border-neutral-800">
       <div class="inline-flex justify-center items-center">
         <span class="size-2 inline-block bg-green-500 rounded-full me-2"></span>
@@ -60,7 +60,7 @@
     <!-- End Card -->
 
     <!-- Card -->
-    <a href="">
+    <a href="{{ route('admin-patients') }}">
     <div class="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm hover:shadow-md rounded-xl dark:bg-neutral-900 dark:border-neutral-800">
       <div class="inline-flex justify-center items-center">
         <span class="size-2 inline-block bg-yellow-500 rounded-full me-2"></span>
@@ -88,7 +88,7 @@
     <!-- End Card -->
 
     <!-- Card -->
-    <a href="/admin/appointments">
+    <a href="{{ route('admin-appointments') }}">
     <div class="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white hover:shadow-md border shadow-sm rounded-xl dark:bg-neutral-900 dark:border-neutral-800">
       <div class="inline-flex justify-center items-center">
         <span class="size-2 inline-block bg-blue-500 rounded-full me-2"></span>
@@ -116,7 +116,7 @@
     <!-- End Card -->
 
     <!-- Card -->
-    <a href="/admin/specialities">
+    <a href="{{ route('admin-specialities') }}">
     <div class="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm hover:shadow-md rounded-xl dark:bg-neutral-900 dark:border-neutral-800">
       <div class="inline-flex justify-center items-center">
         <span class="size-2 inline-block bg-violet-500 rounded-full me-2"></span>

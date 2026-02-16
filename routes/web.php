@@ -9,7 +9,7 @@ Route::view('/', 'welcome');
 
 Route::group(['middleware' => ['auth', 'patient']], function () {
     Route::view('dashboard', 'dashboard')
-        ->middleware(['verified', 'patient']) // role == 0
+        ->middleware(['patient']) // role == 0
         ->name('dashboard');
 
     Route::get('/my/appointments', [PatientController::class, 'loadMyAppointments'])
@@ -38,6 +38,9 @@ Route::group(['middleware' => 'doctor'], function () {
 
     Route::get('/doctor/appointments', [DoctorController::class, 'loadAllAppointments'])
         ->name('doctor-appointments');
+
+    Route::get('/doctor/patient-status-requests', [DoctorController::class, 'loadPatientStatusRequests'])
+        ->name('doctor-patient-status-requests');
 
     Route::get('/doctor/schedules', [DoctorController::class, 'loadAllSchedules'])
         ->name('my-schedules');
@@ -74,6 +77,12 @@ Route::group(['middleware' => 'admin'], function () {
     // appointments
     Route::get('/admin/appointments', [AdminController::class, 'loadAllAppointments'])
         ->name('admin-appointments');
+    Route::get('/admin/announcements', [AdminController::class, 'loadAnnouncementBanners'])
+        ->name('admin-announcements');
+    Route::get('/admin/patients', [AdminController::class, 'loadPatientRecords'])
+        ->name('admin-patients');
+    Route::get('/admin/patients/audits/print', [AdminController::class, 'printPatientStatusAudits'])
+        ->name('admin-patient-audits-print');
     Route::get('/admin/reschedule/{appointment_id}', [AdminController::class, 'loadReschedulingForm']);
 });
 

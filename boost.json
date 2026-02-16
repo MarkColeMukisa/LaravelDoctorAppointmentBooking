@@ -1,6 +1,6 @@
 {
     "agents": [
-        "cursor",
+        "codex",
         "gemini",
         "opencode"
     ],

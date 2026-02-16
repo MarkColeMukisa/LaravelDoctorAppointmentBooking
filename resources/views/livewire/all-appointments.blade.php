@@ -1,11 +1,6 @@
 <!-- Table Section -->
 <div class="max-w-[85rem] px-4 py-5 sm:px-6 lg:px-8 lg:py-7 mx-auto">
-  @if (session()->has('message') && request()->header('X-Livewire'))
-    <div wire:transition.opacity class="mb-3 bg-emerald-600 text-sm text-white rounded-lg p-3" role="alert">
-      <span class="font-semibold">Success</span>
-      <span class="ml-1">{{ session('message') }}.</span>
-    </div>
-  @endif
+  <x-success-toast :livewire-only="true" />
   <div wire:loading>
     <div class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-blue-500" role="status" aria-label="loading">
       <span class="sr-only">Loading...</span>
@@ -118,6 +113,19 @@
                               <livewire:profile-image :user_id="$appointment->patient->id"/>
                               <div>
                                 <span class="block text-sm font-semibold text-gray-800 dark:text-neutral-200">{{ $appointment->patient->name}}</span>
+                                @php
+                                    $patientStatus = $appointment->patient->patient_status ?? \App\Models\User::PATIENT_STATUS_INACTIVE;
+                                    $patientStatusMap = [
+                                        \App\Models\User::PATIENT_STATUS_ACTIVE => ['label' => 'Active', 'classes' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-500'],
+                                        \App\Models\User::PATIENT_STATUS_INACTIVE => ['label' => 'Inactive', 'classes' => 'bg-slate-200 text-slate-800 dark:bg-slate-500/10 dark:text-slate-300'],
+                                        \App\Models\User::PATIENT_STATUS_DECEASED => ['label' => 'Deceased', 'classes' => 'bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-500'],
+                                        \App\Models\User::PATIENT_STATUS_TRANSFERRED => ['label' => 'Transferred', 'classes' => 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-500'],
+                                    ];
+                                    $patientStatusMeta = $patientStatusMap[$patientStatus] ?? $patientStatusMap[\App\Models\User::PATIENT_STATUS_INACTIVE];
+                                @endphp
+                                <span class="mt-2 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide {{ $patientStatusMeta['classes'] }}">
+                                  {{ $patientStatusMeta['label'] }}
+                                </span>
                               </div>
                             </div>
                           </a>
