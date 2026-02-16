@@ -30,6 +30,21 @@
           </div>
           <!-- End Header -->
 
+          <div class="space-y-3 p-4 md:hidden">
+            @forelse ($specialities as $item)
+              <article wire:key="speciality-mobile-{{ $item->id }}" class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-900">{{ $item->speciality_name }}</p>
+                <div class="mt-3 flex items-center gap-3">
+                  <a href="/edit/speciality/{{ $item->id }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">Edit</a>
+                  <button wire:confirm.prevent="Are you sure?" wire:click="delete({{ $item->id }})" class="text-sm font-medium text-red-600 hover:text-red-800">Delete</button>
+                </div>
+              </article>
+            @empty
+              <p class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-5 text-center text-sm text-slate-500">No data found!</p>
+            @endforelse
+          </div>
+
+          <div class="hidden md:block">
           <!-- Table -->
           <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
             <thead class="bg-gray-50 divide-y divide-gray-200 dark:bg-neutral-800 dark:divide-neutral-700">
@@ -86,6 +101,7 @@
             </tbody>
           </table>
           <!-- End Table -->
+          </div>
 
         </div>
       </div>

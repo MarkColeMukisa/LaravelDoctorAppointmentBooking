@@ -1,10 +1,63 @@
 <?php
 
 use App\Livewire\Actions\Logout;
+use App\Models\User;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
+    /**
+     * Build role-specific navigation links for desktop and mobile views.
+     *
+     * @return array<int, array{label:string, route:string, active:array<int, string>}>
+     */
+    public function navigationItemsForRole(int $role): array
+    {
+        if ($role === User::ROLE_ADMIN) {
+            return [
+                ['label' => 'Dashboard', 'route' => 'admin-dashboard', 'active' => ['admin-dashboard']],
+                ['label' => 'Doctors', 'route' => 'admin-doctors', 'active' => ['admin-doctors']],
+                ['label' => 'Doctor Applications', 'route' => 'admin-doctor-applications', 'active' => ['admin-doctor-applications', 'admin-doctor-application-detail']],
+                ['label' => 'Specialities', 'route' => 'admin-specialities', 'active' => ['admin-specialities']],
+                ['label' => 'Patients', 'route' => 'admin-patients', 'active' => ['admin-patients']],
+                ['label' => 'Announcements', 'route' => 'admin-announcements', 'active' => ['admin-announcements']],
+                ['label' => 'All Appointments', 'route' => 'admin-appointments', 'active' => ['admin-appointments']],
+            ];
+        }
+
+        if ($role === User::ROLE_DOCTOR) {
+            return [
+                ['label' => 'Dashboard', 'route' => 'doctor-dashboard', 'active' => ['doctor-dashboard']],
+                ['label' => 'Schedules', 'route' => 'my-schedules', 'active' => ['my-schedules']],
+                ['label' => 'My Appointments', 'route' => 'doctor-appointments', 'active' => ['doctor-appointments']],
+                ['label' => 'Status Requests', 'route' => 'doctor-patient-status-requests', 'active' => ['doctor-patient-status-requests']],
+            ];
+        }
+
+        if ($role === User::ROLE_PATIENT) {
+            return [
+                ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => ['dashboard']],
+                ['label' => 'My Appointments', 'route' => 'my-appointments', 'active' => ['my-appointments']],
+                ['label' => 'Articles', 'route' => 'articles', 'active' => ['articles']],
+            ];
+        }
+
+        return [];
+    }
+
+    public function homeRouteForRole(int $role): string
+    {
+        if ($role === User::ROLE_ADMIN) {
+            return 'admin-dashboard';
+        }
+
+        if ($role === User::ROLE_DOCTOR) {
+            return 'doctor-dashboard';
+        }
+
+        return 'dashboard';
+    }
+
     /**
      * Log the current user out of the application.
      */
@@ -17,68 +70,30 @@ new class extends Component
 }; ?>
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+    @php
+        $currentUser = auth()->user();
+        $navigationItems = $currentUser ? $this->navigationItemsForRole((int) $currentUser->role) : [];
+        $homeRoute = $currentUser ? $this->homeRouteForRole((int) $currentUser->role) : 'dashboard';
+    @endphp
+
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
+                    <a href="{{ route($homeRoute) }}" wire:navigate>
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    
-                    @if (auth()->user() && auth()->user()->role == 2)
-                        <x-nav-link :href="route('admin-dashboard')" :active="request()->routeIs('admin-dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                    @foreach ($navigationItems as $item)
+                        <x-nav-link :href="route($item['route'])" :active="request()->routeIs(...$item['active'])" wire:navigate>
+                            {{ __($item['label']) }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin-doctors')" :active="request()->routeIs('admin-doctors')" wire:navigate>
-                        {{ __('Doctors') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin-doctor-applications')" :active="request()->routeIs('admin-doctor-applications')" wire:navigate>
-                        {{ __('Doctor Applications') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin-specialities')" :active="request()->routeIs('admin-specialities')" wire:navigate>
-                        {{ __('Specialities') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin-patients')" :active="request()->routeIs('admin-patients')" wire:navigate>
-                        {{ __('Patients') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin-announcements')" :active="request()->routeIs('admin-announcements')" wire:navigate>
-                        {{ __('Announcements') }}
-                        </x-nav-link>
-                         <x-nav-link :href="route('admin-appointments')" :active="request()->routeIs('admin-appointments')" wire:navigate>
-                        {{ __('All Appointments') }}
-                        </x-nav-link>
-                    @endif
-                    @if (auth()->user() && auth()->user()->role == 0)
-                       <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('my-appointments')" :active="request()->routeIs('my-appointments')" wire:navigate>
-                        {{ __('My Appointments') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('articles')" :active="request()->routeIs('articles')" wire:navigate>
-                        {{ __('Articles') }}
-                        </x-nav-link>
-                    @endif
-                    @if (auth()->user() && auth()->user()->role == 1)
-                        <x-nav-link :href="route('doctor-dashboard')" :active="request()->routeIs('doctor-dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('my-schedules')" :active="request()->routeIs('my-schedules')" wire:navigate>
-                        {{ __('Schedules') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('doctor-appointments')" :active="request()->routeIs('doctor-appointments')" wire:navigate>
-                        {{ __('My Appointments') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('doctor-patient-status-requests')" :active="request()->routeIs('doctor-patient-status-requests')" wire:navigate>
-                        {{ __('Status Requests') }}
-                        </x-nav-link>
-                    @endif
+                    @endforeach
                 </div>
             </div>
 
@@ -127,9 +142,11 @@ new class extends Component
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @foreach ($navigationItems as $item)
+                <x-responsive-nav-link :href="route($item['route'])" :active="request()->routeIs(...$item['active'])" wire:navigate>
+                    {{ __($item['label']) }}
+                </x-responsive-nav-link>
+            @endforeach
         </div>
 
         <!-- Responsive Settings Options -->
