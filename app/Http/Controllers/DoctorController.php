@@ -2,11 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doctor;
+
 class DoctorController extends Controller
 {
     public function loadDoctorDashboard()
     {
         return view('doctor.dashboard');
+    }
+
+    public function loadProfileEditForm()
+    {
+        $doctor = Doctor::query()
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+        $id = $doctor->id;
+
+        return view('doctor.edit-profile', compact('id'));
     }
 
     public function loadAllAppointments()
@@ -38,8 +50,8 @@ class DoctorController extends Controller
         return view('doctor.reschedule-form', compact('appointment_id'));
     }
 
-    public function loadPatientStatusRequests()
+    public function loadPatientRecords()
     {
-        return view('doctor.patient-status-requests');
+        return view('doctor.patients');
     }
 }

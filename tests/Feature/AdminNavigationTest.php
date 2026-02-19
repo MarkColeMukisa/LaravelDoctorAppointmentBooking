@@ -23,7 +23,6 @@ class AdminNavigationTest extends TestCase
             'Doctors' => route('admin-doctors'),
             'Doctor Applications' => route('admin-doctor-applications'),
             'Specialities' => route('admin-specialities'),
-            'Patients' => route('admin-patients'),
             'Announcements' => route('admin-announcements'),
             'All Appointments' => route('admin-appointments'),
         ];

@@ -42,6 +42,10 @@ class EditDoctor extends Component
         $this->doctor = Doctor::query()
             ->with(['doctorUser', 'speciality'])
             ->findOrFail($doctor_id);
+        $currentUser = auth()->user();
+        if ($currentUser && (int) $currentUser->role === User::ROLE_DOCTOR && $this->doctor->user_id !== $currentUser->id) {
+            abort(403);
+        }
 
         $this->specialities = Specialities::query()
             ->select(['id', 'speciality_name'])
@@ -105,6 +109,10 @@ class EditDoctor extends Component
             ]);
 
         session()->flash('message', 'Doctor updated successfully.');
+
+        if ((int) auth()->user()?->role === User::ROLE_DOCTOR) {
+            return $this->redirect('/doctor/profile/edit', navigate: true);
+        }
 
         return $this->redirect('/admin/doctors', navigate: true);
     }

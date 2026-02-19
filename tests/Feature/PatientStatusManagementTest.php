@@ -51,15 +51,15 @@ class PatientStatusManagementTest extends TestCase
             ->assertDontSee('updatePatientStatus');
     }
 
-    public function test_doctor_has_dedicated_status_requests_page(): void
+    public function test_doctor_has_dedicated_patients_page(): void
     {
         $doctorUser = User::factory()->create([
             'role' => User::ROLE_DOCTOR,
         ]);
 
         $this->actingAs($doctorUser)
-            ->get(route('doctor-patient-status-requests'))
+            ->get(route('doctor-patients'))
             ->assertOk()
-            ->assertSee('Patient Status Requests');
+            ->assertSee('My Patients');
     }
 }

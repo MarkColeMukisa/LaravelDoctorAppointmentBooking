@@ -8,7 +8,9 @@ use App\Models\DoctorApplication;
 use App\Models\Specialities;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -22,7 +24,8 @@ class RegistrationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSeeVolt('pages.auth.register');
+            ->assertSeeVolt('pages.auth.register')
+            ->assertSee('sm:max-w-3xl');
     }
 
     public function test_back_action_redirects_to_login_on_first_step(): void
@@ -63,6 +66,7 @@ class RegistrationTest extends TestCase
     public function test_doctor_registration_option_creates_doctor_application_and_sends_notifications(): void
     {
         Mail::fake();
+        Storage::fake(config('filesystems.default'));
 
         config()->set('mail.admin.address', 'admin@clinic.test');
 
@@ -81,7 +85,8 @@ class RegistrationTest extends TestCase
             ->set('doctor_hospital_name', 'City Clinic')
             ->set('doctor_speciality_id', (string) $speciality->id)
             ->set('doctor_experience', '9')
-            ->set('doctor_bio', 'Cardiology specialist');
+            ->set('doctor_bio', 'Cardiology specialist')
+            ->set('doctor_profile_image', UploadedFile::fake()->image('doctor-profile.jpg'));
 
         $component->call('register');
 
@@ -92,6 +97,8 @@ class RegistrationTest extends TestCase
         $user = User::query()->where('email', 'jane@example.com')->first();
 
         $this->assertNotNull($user);
+        $this->assertNotNull($user->profile_image);
+        Storage::disk(config('filesystems.default'))->assertExists($user->profile_image);
         $this->assertDatabaseHas('doctor_applications', [
             'user_id' => $user->id,
             'email' => 'dr.jane@example.com',
@@ -107,5 +114,27 @@ class RegistrationTest extends TestCase
         Mail::assertSent(DoctorApplicationReceived::class, function (DoctorApplicationReceived $mail): bool {
             return $mail->hasTo('dr.jane@example.com');
         });
+    }
+
+    public function test_doctor_registration_requires_profile_image(): void
+    {
+        $speciality = Specialities::query()->create([
+            'speciality_name' => 'Cardiology',
+        ]);
+
+        Volt::test('pages.auth.register')
+            ->set('registrationType', 'doctor')
+            ->set('name', 'Dr Jane Doe')
+            ->set('email', 'jane@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->set('doctor_name', 'Dr Jane Doe')
+            ->set('doctor_email', 'dr.jane@example.com')
+            ->set('doctor_hospital_name', 'City Clinic')
+            ->set('doctor_speciality_id', (string) $speciality->id)
+            ->set('doctor_experience', '9')
+            ->set('doctor_bio', 'Cardiology specialist')
+            ->call('register')
+            ->assertHasErrors(['doctor_profile_image' => 'required']);
     }
 }

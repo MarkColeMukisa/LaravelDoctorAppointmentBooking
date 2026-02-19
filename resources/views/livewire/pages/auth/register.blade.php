@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new #[Layout('layouts.guest')] class extends Component
 {
+    use WithFileUploads;
+
     public string $registrationType = 'patient';
 
     public int $currentStep = 1;
@@ -46,6 +49,8 @@ new #[Layout('layouts.guest')] class extends Component
     public string $doctor_experience = '';
 
     public string $doctor_bio = '';
+
+    public $doctor_profile_image;
 
     public $specialities = [];
 
@@ -83,6 +88,7 @@ new #[Layout('layouts.guest')] class extends Component
             'doctor_speciality_id',
             'doctor_experience',
             'doctor_bio',
+            'doctor_profile_image',
         ]);
     }
 
@@ -158,6 +164,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'doctor_speciality_id' => ['required', 'integer', 'exists:specialities,id'],
                 'doctor_experience' => ['required', 'integer', 'min:0', 'max:80'],
                 'doctor_bio' => ['required', 'string', 'max:2000'],
+                'doctor_profile_image' => ['required', 'image', 'max:2048'],
             ]);
         }
 
@@ -195,6 +202,9 @@ new #[Layout('layouts.guest')] class extends Component
         ])));
 
         $user->role = User::ROLE_PATIENT;
+        if ($this->registrationType === 'doctor') {
+            $user->profile_image = $this->doctor_profile_image->store('public/images');
+        }
         $user->save();
 
         if ($this->registrationType === 'doctor') {
@@ -398,6 +408,15 @@ new #[Layout('layouts.guest')] class extends Component
                     <x-input-label for="doctor_email" :value="__('Professional Email')" />
                     <x-text-input wire:model="doctor_email" id="doctor_email" class="mt-1 block w-full" type="email" />
                     <x-input-error class="mt-2" :messages="$errors->get('doctor_email')" />
+                </div>
+
+                <div>
+                    <x-input-label for="doctor_profile_image" :value="__('Profile Image')" />
+                    <input wire:model="doctor_profile_image" id="doctor_profile_image" type="file" accept="image/*" class="mt-1 block w-full rounded-md border-gray-300" />
+                    @if ($doctor_profile_image)
+                        <img src="{{ $doctor_profile_image->temporaryUrl() }}" class="mt-2 h-24 w-24 rounded-lg object-cover" alt="Doctor profile image preview">
+                    @endif
+                    <x-input-error class="mt-2" :messages="$errors->get('doctor_profile_image')" />
                 </div>
 
                 <div>
