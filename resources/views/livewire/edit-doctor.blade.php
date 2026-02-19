@@ -22,6 +22,17 @@
                     <x-input-error :messages="$errors->get('bio')" class="mt-2" />
                 </div>
 
+                <div class="mt-4">
+                    <x-input-label for="image" :value="__('Doctor Image')" />
+                    @if ($image)
+                        <img src="{{ $image->temporaryUrl() }}" class="mt-2 h-24 w-24 rounded-lg object-cover" alt="Doctor image preview">
+                    @elseif ($current_image)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($current_image) }}" class="mt-2 h-24 w-24 rounded-lg object-cover" alt="Current doctor image">
+                    @endif
+                    <input wire:model="image" id="image" type="file" accept="image/*"
+                        class="mt-2 py-2 px-3 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500" />
+                    <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                </div>
 
                 <!-- Hospital Name -->
                 <div>
@@ -63,7 +74,7 @@
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
-                    <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:pointer-events-none" href="/admin/doctors">
+                    <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:pointer-events-none" href="{{ auth()->user()->role == \App\Models\User::ROLE_DOCTOR ? route('doctor-dashboard') : route('admin-doctors') }}">
                         Cancel
                     </a>
 

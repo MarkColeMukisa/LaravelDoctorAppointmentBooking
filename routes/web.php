@@ -36,11 +36,14 @@ Route::group(['middleware' => 'doctor'], function () {
     Route::get('/doctor/dashboard', [DoctorController::class, 'loadDoctorDashboard'])
         ->name('doctor-dashboard');
 
+    Route::get('/doctor/profile/edit', [DoctorController::class, 'loadProfileEditForm'])
+        ->name('doctor-profile-edit');
+
     Route::get('/doctor/appointments', [DoctorController::class, 'loadAllAppointments'])
         ->name('doctor-appointments');
 
-    Route::get('/doctor/patient-status-requests', [DoctorController::class, 'loadPatientStatusRequests'])
-        ->name('doctor-patient-status-requests');
+    Route::get('/doctor/patients', [DoctorController::class, 'loadPatientRecords'])
+        ->name('doctor-patients');
 
     Route::get('/doctor/schedules', [DoctorController::class, 'loadAllSchedules'])
         ->name('my-schedules');
@@ -79,10 +82,6 @@ Route::group(['middleware' => 'admin'], function () {
         ->name('admin-appointments');
     Route::get('/admin/announcements', [AdminController::class, 'loadAnnouncementBanners'])
         ->name('admin-announcements');
-    Route::get('/admin/patients', [AdminController::class, 'loadPatientRecords'])
-        ->name('admin-patients');
-    Route::get('/admin/patients/audits/print', [AdminController::class, 'printPatientStatusAudits'])
-        ->name('admin-patient-audits-print');
     Route::get('/admin/reschedule/{appointment_id}', [AdminController::class, 'loadReschedulingForm']);
 });
 
